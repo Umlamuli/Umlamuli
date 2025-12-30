@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="StreamPipelineBehaviorTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 using System.Threading;
 
 namespace Umlamuli.Tests.Pipeline.Streams;
@@ -65,7 +74,7 @@ public class StreamPipelineBehaviorTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        var responses = mediator.CreateStream(new Sing { Message = "Sing" });
+        var responses = mediator.CreateStream(new Sing { Message = "Sing" }, TestContext.Current.CancellationToken);
 
         int i = 0;
         await foreach (var response in responses)

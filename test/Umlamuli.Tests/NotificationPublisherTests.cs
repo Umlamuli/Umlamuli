@@ -1,11 +1,19 @@
-﻿using System.Diagnostics;
+//-----------------------------------------------------------------------
+// <copyright file="NotificationPublisherTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Umlamuli.NotificationPublishers;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Umlamuli.Tests;
 
@@ -43,7 +51,7 @@ public class NotificationPublisherTests
         var timer = new Stopwatch();
         timer.Start();
 
-        await mediator.Publish(new Notification());
+        await mediator.Publish(new Notification(), TestContext.Current.CancellationToken);
 
         timer.Stop();
 
@@ -61,7 +69,7 @@ public class NotificationPublisherTests
 
         timer.Restart();
 
-        await mediator.Publish(new Notification());
+        await mediator.Publish(new Notification(), TestContext.Current.CancellationToken);
 
         timer.Stop();
 

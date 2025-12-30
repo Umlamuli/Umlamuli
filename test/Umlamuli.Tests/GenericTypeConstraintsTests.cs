@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="GenericTypeConstraintsTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 using System.Reflection;
 using System.Threading;
 
@@ -107,7 +116,7 @@ public class GenericTypeConstraintsTests
         var jing = new Jing { Message = "Jing" };
 
         // Test mediator still works sending request
-        await _mediator.Send(jing);
+        await _mediator.Send(jing, TestContext.Current.CancellationToken);
 
         // Create new instance of type constrained class
         var genericTypeConstraintsVoidReturn = new  GenericTypeConstraintJing();
@@ -134,7 +143,7 @@ public class GenericTypeConstraintsTests
         var ping = new Ping { Message = "Ping" };
 
         // Test mediator still works sending request and gets response
-        var pingResponse = await _mediator.Send(ping);
+        var pingResponse = await _mediator.Send(ping, TestContext.Current.CancellationToken);
         pingResponse.Message.ShouldBe("Ping Pong");
 
         // Create new instance of type constrained class

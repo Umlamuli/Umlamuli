@@ -1,4 +1,13 @@
-﻿using System;
+//-----------------------------------------------------------------------
+// <copyright file="DerivingRequestsTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -23,14 +32,14 @@ public class DerivingRequestsTests
     [Fact]
     public async Task ShouldReturnPingPong()
     {
-        Pong pong = await _mediator.Send(new Ping() { Message = "Ping" });
+        Pong pong = await _mediator.Send(new Ping() { Message = "Ping" }, TestContext.Current.CancellationToken);
         pong.Message.ShouldBe("Ping Pong");
     }
 
     [Fact]
     public async Task ShouldReturnDerivedPingPong()
     {
-        Pong pong = await _mediator.Send(new DerivedPing() { Message = "Ping" });
+        Pong pong = await _mediator.Send(new DerivedPing() { Message = "Ping" }, TestContext.Current.CancellationToken);
         pong.Message.ShouldBe("DerivedPing Pong");
     }
 }

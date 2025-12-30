@@ -1,4 +1,13 @@
-﻿namespace Umlamuli.NotificationPublishers;
+//-----------------------------------------------------------------------
+// <copyright file="TaskWhenAllPublisher.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
+namespace Umlamuli.NotificationPublishers;
 
 /// <summary>
 ///     Uses <see cref="Task.WhenAll(System.Collections.Generic.IEnumerable{System.Threading.Tasks.Task})" /> to publish a

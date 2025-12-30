@@ -6,8 +6,14 @@
 [![NuGet](https://img.shields.io/nuget/vpre/umlamuli.svg)](https://www.nuget.org/packages/umlamuli)
 [![MyGet (dev)](https://img.shields.io/myget/umlamuli-ci/v/Umlamuli.svg)](https://myget.org/gallery/umlamuli-ci)
 
+Umlamuli.Contracts
+=======
+
+[![NuGet](https://img.shields.io/nuget/dt/umlamuli.contracts.svg)](https://www.nuget.org/packages/umlamuli.contracts)
+[![NuGet](https://img.shields.io/nuget/vpre/umlamuli.contracts.svg)](https://www.nuget.org/packages/umlamuli.contracts)
+
 # About Umlamuli
-Umlamuli is an open-source continuation of the MediatR library.  MediatR has changed it licence to a commercial one starting with version 13.
+Umlamuli is an open-source continuation of the MediatR library.  MediatR has changed its licence to a commercial one starting with version 13.
 I have complete respect for Jimmy Bogard and the work he has done on MediatR, but I want to keep using an open-source mediator library.  I also feel that the Mediator pattern is a useful one to have available in .NET projects, but as it is fairly simple to implement, I have decided to create this fork and maintain it going forward.
 
 [Umlamuli](https://isizulu.net/?umlamuli) [umlaˈmuːli] is a Zulu word,  means "mediator" or "arbiter".
@@ -20,7 +26,7 @@ Simple, unambitious mediator implementation in .NET.
 
 In-process messaging with no dependencies.
 
-This repository has been renamed from Umlamuli to Umlamuli. All namespaces, assemblies, and project names now use `Umlamuli`.
+This repository has been renamed from MediatR to Umlamuli. All namespaces, assemblies, and project names now use `Umlamuli`.
 Supports request/response, commands, queries, notifications and events, synchronous and async with intelligent dispatching via C# generic variance.
 
 Examples in the [wiki](https://github.com/Umlamuli/Umlamuli/wiki).

@@ -1,4 +1,13 @@
-﻿using System;
+//-----------------------------------------------------------------------
+// <copyright file="PipeLineMultiCallToConstructorTest.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
+using System;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -93,7 +102,7 @@ public class PipelineMultiCallToConstructorTests
 
         var mediator = provider.GetRequiredService<IMediator>();
 
-        var response = await mediator.Send(new ConstructorTestRequest { Message = "ConstructorPing" });
+        var response = await mediator.Send(new ConstructorTestRequest { Message = "ConstructorPing" }, TestContext.Current.CancellationToken);
 
         response.Message.ShouldBe("ConstructorPing ConstructorPong");
 

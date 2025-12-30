@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="PipelineTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 using System.Threading;
 
 namespace Umlamuli.Tests;
@@ -261,7 +270,7 @@ public class PipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        var response = await mediator.Send(new Ping { Message = "Ping" });
+        var response = await mediator.Send(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         response.Message.ShouldBe("Ping Pong");
 
@@ -296,7 +305,7 @@ public class PipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        await mediator.Send(new VoidPing { Message = "Ping" });
+        await mediator.Send(new VoidPing { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         output.Messages.ShouldBe(new []
         {
@@ -331,7 +340,7 @@ public class PipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        var response = await mediator.Send(new Ping { Message = "Ping" });
+        var response = await mediator.Send(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         response.Message.ShouldBe("Ping Pong");
 
@@ -369,7 +378,7 @@ public class PipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        await mediator.Send(new VoidPing { Message = "Ping" });
+        await mediator.Send(new VoidPing { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         output.Messages.ShouldBe(new[]
         {
@@ -407,7 +416,7 @@ public class PipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        var response = await mediator.Send(new Ping { Message = "Ping" });
+        var response = await mediator.Send(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         response.Message.ShouldBe("Ping Pong");
 
@@ -424,7 +433,7 @@ public class PipelineTests
 
         output.Messages.Clear();
 
-        var zingResponse = await mediator.Send(new Zing { Message = "Zing" });
+        var zingResponse = await mediator.Send(new Zing { Message = "Zing" }, TestContext.Current.CancellationToken);
 
         zingResponse.Message.ShouldBe("Zing Zong");
 
@@ -464,7 +473,7 @@ public class PipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        var response = await mediator.Send(new Ping { Message = "Ping" });
+        var response = await mediator.Send(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         response.Message.ShouldBe("Ping Pong");
 
@@ -481,7 +490,7 @@ public class PipelineTests
 
         output.Messages.Clear();
 
-        var zingResponse = await mediator.Send(new Zing { Message = "Zing" });
+        var zingResponse = await mediator.Send(new Zing { Message = "Zing" }, TestContext.Current.CancellationToken);
 
         zingResponse.Message.ShouldBe("Zing Zong");
 

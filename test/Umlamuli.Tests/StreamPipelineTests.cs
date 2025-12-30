@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="StreamPipelineTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 using System.Threading;
 
 namespace Umlamuli.Tests;
@@ -212,7 +221,7 @@ public class StreamPipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        await foreach(var response in mediator.CreateStream(new Ping { Message = "Ping" }))
+        await foreach(var response in mediator.CreateStream(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken))
         {
             response.Message.ShouldBe("Ping Pong");
         }
@@ -250,7 +259,7 @@ public class StreamPipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        await foreach (var response in mediator.CreateStream(new Ping { Message = "Ping" }))
+        await foreach (var response in mediator.CreateStream(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken))
         {
             response.Message.ShouldBe("Ping Pong");
         }
@@ -289,7 +298,7 @@ public class StreamPipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        await foreach (var response in mediator.CreateStream(new Ping { Message = "Ping" }))
+        await foreach (var response in mediator.CreateStream(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken))
         {
             response.Message.ShouldBe("Ping Pong");
         }
@@ -307,7 +316,7 @@ public class StreamPipelineTests
 
         output.Messages.Clear();
 
-        await foreach (var response in mediator.CreateStream(new Zing { Message = "Zing" }))
+        await foreach (var response in mediator.CreateStream(new Zing { Message = "Zing" }, TestContext.Current.CancellationToken))
         {
             response.Message.ShouldBe("Zing Zong");
         }
@@ -346,7 +355,7 @@ public class StreamPipelineTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        await foreach (var response in mediator.CreateStream(new Ping { Message = "Ping" }))
+        await foreach (var response in mediator.CreateStream(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken))
         {
             response.Message.ShouldBe("Ping Pong");
         }
@@ -364,7 +373,7 @@ public class StreamPipelineTests
 
         output.Messages.Clear();
 
-        await foreach (var response in mediator.CreateStream(new Zing { Message = "Zing" }))
+        await foreach (var response in mediator.CreateStream(new Zing { Message = "Zing" }, TestContext.Current.CancellationToken))
         {
             response.Message.ShouldBe("Zing Zong");
         }

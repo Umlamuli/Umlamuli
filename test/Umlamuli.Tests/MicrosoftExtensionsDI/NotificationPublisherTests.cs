@@ -1,4 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+//-----------------------------------------------------------------------
+// <copyright file="NotificationPublisherTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,7 +73,7 @@ public class NotificationPublisherTests
 
         mediator.ShouldNotBeNull();
 
-        await mediator.Publish(new Pinged());
+        await mediator.Publish(new Pinged(), TestContext.Current.CancellationToken);
 
         publisher.CallCount.ShouldBeGreaterThan(0);
     }
@@ -88,7 +97,7 @@ public class NotificationPublisherTests
         mediator.ShouldNotBeNull();
         publisher.ShouldNotBeNull();
 
-        await mediator.Publish(new Pinged());
+        await mediator.Publish(new Pinged(), TestContext.Current.CancellationToken);
 
         var mock = publisher.ShouldBeOfType<MockPublisher>();
 
@@ -114,7 +123,7 @@ public class NotificationPublisherTests
         mediator.ShouldNotBeNull();
         publisher.ShouldNotBeNull();
 
-        await Should.NotThrowAsync(mediator.Publish(new Pinged()));
+        await Should.NotThrowAsync(mediator.Publish(new Pinged(), TestContext.Current.CancellationToken));
 
         publisher.ShouldBeOfType<TaskWhenAllPublisher>();
     }

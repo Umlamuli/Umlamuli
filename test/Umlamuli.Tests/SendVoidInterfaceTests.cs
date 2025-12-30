@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="SendVoidInterfaceTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 using System.Threading;
 
 namespace Umlamuli.Tests;
@@ -49,7 +58,7 @@ public class SendVoidInterfaceTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        await mediator.Send(new Ping { Message = "Ping" });
+        await mediator.Send(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         builder.ToString().ShouldBe("Ping Pong");
     }

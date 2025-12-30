@@ -1,0 +1,32 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/Umlamuli.Examples.AspNetCore/Umlamuli.Examples.AspNetCore.csproj" />
+    <Project Path="samples/Umlamuli.Examples.Autofac/Umlamuli.Examples.Autofac.csproj" />
+    <Project Path="samples/Umlamuli.Examples.DryIoc/Umlamuli.Examples.DryIoc.csproj" />
+    <Project Path="samples/Umlamuli.Examples.Lamar/Umlamuli.Examples.Lamar.csproj" />
+    <Project Path="samples/Umlamuli.Examples.LightInject/Umlamuli.Examples.LightInject.csproj" />
+    <Project Path="samples/Umlamuli.Examples.PublishStrategies/Umlamuli.Examples.PublishStrategies.csproj" />
+    <Project Path="samples/Umlamuli.Examples.SimpleInjector/Umlamuli.Examples.SimpleInjector.csproj" />
+    <Project Path="samples/Umlamuli.Examples.Stashbox/Umlamuli.Examples.Stashbox.csproj" />
+    <Project Path="samples/Umlamuli.Examples/Umlamuli.Examples.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/release.yml" />
+    <File Path="Build.ps1" />
+    <File Path="BuildContracts.ps1" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="Push.ps1" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Umlamuli.Contracts/Umlamuli.Contracts.csproj" />
+    <Project Path="src/Umlamuli/Umlamuli.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Umlamuli.Benchmarks/Umlamuli.Benchmarks.csproj" />
+    <Project Path="test/Umlamuli.Tests/Umlamuli.Tests.csproj" />
+  </Folder>
+</Solution>

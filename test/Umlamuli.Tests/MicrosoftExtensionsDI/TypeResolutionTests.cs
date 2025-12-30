@@ -1,4 +1,13 @@
-﻿using System.Collections.Generic;
+//-----------------------------------------------------------------------
+// <copyright file="TypeResolutionTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Umlamuli.Extensions.Microsoft.DependencyInjection.Tests;

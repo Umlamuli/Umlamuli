@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="RequestExceptionActionTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 namespace Umlamuli.Tests.Pipeline;
 
 using System;
@@ -112,7 +121,7 @@ public class RequestExceptionActionTests
         var mediator = container.GetInstance<IMediator>();
 
         var request = new Ping { Message = "Ping!" };
-        await Assert.ThrowsAsync<PingException>(() => mediator.Send(request));
+        await Assert.ThrowsAsync<PingException>(() => mediator.Send(request, TestContext.Current.CancellationToken));
 
         pingExceptionAction.Executed.ShouldBeTrue();
         pingPongExceptionAction.Executed.ShouldBeTrue();
@@ -134,7 +143,7 @@ public class RequestExceptionActionTests
         var mediator = container.GetInstance<IMediator>();
 
         var request = new Ping { Message = "Ping!" };
-        await Assert.ThrowsAsync<PingException>(() => mediator.Send(request));
+        await Assert.ThrowsAsync<PingException>(() => mediator.Send(request, TestContext.Current.CancellationToken));
 
         genericExceptionAction.ExecutionCount.ShouldBe(1);
     }

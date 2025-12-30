@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="CreateStreamTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 using System.Threading;
 
 namespace Umlamuli.Tests;
@@ -48,7 +57,7 @@ public class CreateStreamTests
 
         var mediator = container.GetInstance<IMediator>();
 
-        var response = mediator.CreateStream(new Ping { Message = "Ping" });
+        var response = mediator.CreateStream(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
         int i = 0;
         await foreach (Pong result in response)
         {
@@ -81,7 +90,7 @@ public class CreateStreamTests
         var mediator = container.GetInstance<IMediator>();
 
         object request = new Ping { Message = "Ping" };
-        var response = mediator.CreateStream(request);
+        var response = mediator.CreateStream(request, TestContext.Current.CancellationToken);
         int i = 0;
         await foreach (Pong? result in response)
         {
@@ -112,7 +121,7 @@ public class CreateStreamTests
         });
 
         var mediator = container.GetInstance<ISender>();
-        var response = mediator.CreateStream(new Ping { Message = "Ping" });
+        var response = mediator.CreateStream(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
         int i = 0;
         await foreach (Pong result in response)
         {

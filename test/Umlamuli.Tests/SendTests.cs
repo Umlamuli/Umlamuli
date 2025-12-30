@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------
+// <copyright file="SendTests.cs" company="Umlamuli">
+// Original Copyright (c) 2025 Jimmy Bogard. All rights reserved.
+// Licensed under the Apache License, Version 2.0
+//
+// Modifications Copyright 2025 Umlamuli
+// Licensed under the Apache License, Version 2.0
+// </copyright>
+//-----------------------------------------------------------------------
 using System.Threading;
 
 using System;
@@ -202,7 +211,7 @@ public class SendTests
     [Fact]
     public async Task Should_resolve_main_handler()
     {
-        var response = await _mediator.Send(new Ping { Message = "Ping" });
+        var response = await _mediator.Send(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         response.Message.ShouldBe("Ping Pong");
     }
@@ -210,7 +219,7 @@ public class SendTests
     [Fact]
     public async Task Should_resolve_main_void_handler()
     {
-        await _mediator.Send(new VoidPing());
+        await _mediator.Send(new VoidPing(), TestContext.Current.CancellationToken);
 
         _dependency.Called.ShouldBeTrue();
     }
@@ -219,7 +228,7 @@ public class SendTests
     public async Task Should_resolve_main_handler_via_dynamic_dispatch()
     {
         object request = new Ping { Message = "Ping" };
-        var response = await _mediator.Send(request);
+        var response = await _mediator.Send(request, TestContext.Current.CancellationToken);
 
         var pong = response.ShouldBeOfType<Pong>();
         pong.Message.ShouldBe("Ping Pong");
@@ -229,7 +238,7 @@ public class SendTests
     public async Task Should_resolve_main_void_handler_via_dynamic_dispatch()
     {
         object request = new VoidPing();
-        var response = await _mediator.Send(request);
+        var response = await _mediator.Send(request, TestContext.Current.CancellationToken);
 
         response.ShouldBeOfType<Unit>();
 
@@ -239,7 +248,7 @@ public class SendTests
     [Fact]
     public async Task Should_resolve_main_handler_by_specific_interface()
     {
-        var response = await _mediator.Send(new Ping { Message = "Ping" });
+        var response = await _mediator.Send(new Ping { Message = "Ping" }, TestContext.Current.CancellationToken);
 
         response.Message.ShouldBe("Ping Pong");
     }
@@ -249,7 +258,7 @@ public class SendTests
     {
         // wrap requests in an array, so this test won't break on a 'replace with var' refactoring
         var requests = new IRequest[] { new VoidPing() };
-        await _mediator.Send(requests[0]);
+        await _mediator.Send(requests[0], TestContext.Current.CancellationToken);
 
         _dependency.Called.ShouldBeTrue();
     }
@@ -261,7 +270,7 @@ public class SendTests
     public async Task Should_resolve_generic_handler()
     {
         var request = new GenericPing<Pong> { Pong = new Pong { Message = "Ping" } };
-        var result = await _mediator.Send(request);
+        var result = await _mediator.Send(request, TestContext.Current.CancellationToken);
 
         var pong = result.ShouldBeOfType<Pong>();
         pong.Message.ShouldBe("Ping Pong");
@@ -273,7 +282,7 @@ public class SendTests
     public async Task Should_resolve_generic_void_handler()
     {
         var request = new VoidGenericPing<Pong>();
-        await _mediator.Send(request);
+        await _mediator.Send(request, TestContext.Current.CancellationToken);
 
         _dependency.Called.ShouldBeTrue();
     }
@@ -282,7 +291,7 @@ public class SendTests
     public async Task Should_resolve_multiple_type_parameter_generic_handler()
     {
         var request = new MultipleGenericTypeParameterRequest<TestClass1, TestClass2, TestClass3>();
-        await _mediator.Send(request);
+        await _mediator.Send(request, TestContext.Current.CancellationToken);
 
         _dependency.Called.ShouldBeTrue();
     }
@@ -304,7 +313,7 @@ public class SendTests
         var mediator = serviceProvider.GetService<IMediator>()!;
 
         var request = new VoidGenericPing<PongExtension>();
-        await mediator.Send(request);
+        await mediator.Send(request, TestContext.Current.CancellationToken);
 
         dependency.Called.ShouldBeFalse();
         dependency.CalledSpecific.ShouldBeTrue();
@@ -326,7 +335,7 @@ public class SendTests
         var mediator = serviceProvider.GetService<IMediator>()!;
 
         var request = new VoidGenericPing<Pong>();
-        await mediator.Send(request);
+        await mediator.Send(request, TestContext.Current.CancellationToken);
 
         dependency.Called.ShouldBeTrue();
         dependency.CalledSpecific.ShouldBeFalse();

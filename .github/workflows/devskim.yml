@@ -4,6 +4,8 @@
 # documentation.
 
 name: DevSkim
+permissions:
+  contents: read
 
 on:
   push:

@@ -1,7 +1,11 @@
 # https://github.com/actions/stale
 
 name: "Stale issue & PR handler"
-
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  
 on:
   workflow_dispatch:
   schedule:

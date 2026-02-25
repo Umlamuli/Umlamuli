@@ -8,6 +8,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 using System.Reflection;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umlamuli.Pipeline;
@@ -388,10 +389,12 @@ public static class ServiceRegistrar
                 throw new ArgumentException(
                     $"Error registering the generic type: {requestType.FullName}. The number of generic type parameters exceeds the maximum allowed ({_maxGenericTypeParameters}).");
 
-            foreach (var list in lists)
-                if (_maxTypesClosing > 0 && list.Count > _maxTypesClosing)
+            if (_maxTypesClosing > 0)
+            {
+                foreach (var list in lists.Where(list => list.Count > _maxTypesClosing))
                     throw new ArgumentException(
                         $"Error registering the generic type: {requestType.FullName}. One of the generic type parameter's count of types that can close exceeds the maximum length allowed ({_maxTypesClosing}).");
+            }
 
             // Calculate the total number of combinations
             long totalCombinations = 1;

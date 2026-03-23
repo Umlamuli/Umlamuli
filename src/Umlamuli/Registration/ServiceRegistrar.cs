@@ -401,7 +401,7 @@ public static class ServiceRegistrar
             foreach (var list in lists)
             {
                 totalCombinations *= list.Count;
-                if (_maxGenericTypeParameters > 0 && totalCombinations > _maxGenericTypeRegistrations)
+                if (_maxGenericTypeRegistrations > 0 && totalCombinations > _maxGenericTypeRegistrations)
                     throw new ArgumentException(
                         $"Error registering the generic type: {requestType.FullName}. The total number of generic type registrations exceeds the maximum allowed ({_maxGenericTypeRegistrations}).");
             }
@@ -524,14 +524,19 @@ public static class ServiceRegistrar
                 pluggedType.GetInterfaces()
                     .Where(type => type.IsGenericType && (type.GetGenericTypeDefinition() == templateType)))
                 yield return interfaceType;
-        else if (pluggedType.BaseType!.IsGenericType &&
-                 (pluggedType.BaseType!.GetGenericTypeDefinition() == templateType))
-            yield return pluggedType.BaseType!;
+        else
+        {
+            var baseType = pluggedType.BaseType;
 
-        if (pluggedType.BaseType == typeof(object)) yield break;
+            if (baseType == null || baseType == typeof(object))
+                yield break;
 
-        foreach (var interfaceType in FindInterfacesThatClosesCore(pluggedType.BaseType!, templateType))
-            yield return interfaceType;
+            if (baseType.IsGenericType && (baseType.GetGenericTypeDefinition() == templateType))
+                yield return baseType;
+
+            foreach (var interfaceType in FindInterfacesThatClosesCore(baseType, templateType))
+                yield return interfaceType;
+        }
     }
 
     /// <summary>

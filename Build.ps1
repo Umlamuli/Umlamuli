@@ -34,3 +34,5 @@ exec { & dotnet test -c Release --no-build -l trx --verbosity=normal }
 
 exec { & dotnet pack .\src\Umlamuli\Umlamuli.csproj -c Release -o $artifacts --no-build }
 
+exec { & dotnet pack .\src\Umlamuli.SourceGenerator\Umlamuli.SourceGenerator.csproj -c Release -o $artifacts --no-build }
+

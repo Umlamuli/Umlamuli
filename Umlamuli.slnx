@@ -23,10 +23,12 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Umlamuli.Contracts/Umlamuli.Contracts.csproj" />
+    <Project Path="src/Umlamuli.SourceGenerator/Umlamuli.SourceGenerator.csproj" />
     <Project Path="src/Umlamuli/Umlamuli.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/Umlamuli.Benchmarks/Umlamuli.Benchmarks.csproj" />
+    <Project Path="test/Umlamuli.SourceGenerator.Tests/Umlamuli.SourceGenerator.Tests.csproj" />
     <Project Path="test/Umlamuli.Tests/Umlamuli.Tests.csproj" />
   </Folder>
 </Solution>

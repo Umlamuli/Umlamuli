@@ -104,3 +104,29 @@ services.AddUmlamuli(cfg => {
 ```
 
 With additional methods for open generics and overloads for explicit service types.
+
+### Source-generated registration (optional)
+
+For projects that want to avoid runtime assembly scanning, add a reference to [Umlamuli.SourceGenerator](https://www.nuget.org/packages/Umlamuli.SourceGenerator):
+
+    dotnet add package Umlamuli.SourceGenerator
+
+The generator inspects the consuming assembly at compile time and emits two extension methods. Both register the same compile-time-discovered handlers, behaviors, and processors — they differ only in the `IMediator` implementation.
+
+#### `AddUmlamuliGenerated` — runtime dispatch, no scanning
+
+```csharp
+services.AddUmlamuliGenerated();
+```
+
+Binds `IMediator` to the default `Umlamuli.Mediator`. Handler dispatch still goes through the reflection-based wrappers (cached after first use), but the startup cost of `AddUmlamuli(cfg => cfg.RegisterServicesFromAssembly(...))` is replaced by direct `services.AddTransient<...>()` calls emitted at compile time.
+
+#### `AddUmlamuliCompileTime` — switch-based dispatch
+
+```csharp
+services.AddUmlamuliCompileTime();
+```
+
+Binds `IMediator` to a source-generated `UmlamuliGeneratedMediator` that dispatches each request via a `switch` over the concrete request types discovered at compile time. No `MakeGenericType`, no wrapper cache — just a pattern match followed by a typed call into the service provider. Pipeline behaviors and `INotificationPublisher` remain pluggable and are resolved from DI at dispatch time.
+
+Only handlers defined in the consuming assembly are discovered. To pull handlers from other assemblies, reference those assemblies and ensure they also reference `Umlamuli.SourceGenerator` (or call `AddUmlamuli(cfg => cfg.RegisterServicesFromAssemblyContaining<T>())` alongside the generated registrations).

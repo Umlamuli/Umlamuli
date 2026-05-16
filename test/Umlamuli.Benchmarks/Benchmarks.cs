@@ -11,43 +11,70 @@ using System.IO;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using Umlamuli.Benchmarks.Generated;
 
 namespace Umlamuli.Benchmarks;
 
 //[DotTraceDiagnoser]
 public class Benchmarks
 {
-    private IMediator _mediator;
+    private IMediator _runtime;
+    private IMediator _generatedDi;
+    private IMediator _compileTime;
     private readonly Ping _request = new Ping {Message = "Hello World"};
     private readonly Pinged _notification = new Pinged();
 
     [GlobalSetup]
     public void GlobalSetup()
     {
+        _runtime = BuildRuntime();
+        _generatedDi = BuildGeneratedDi();
+        _compileTime = BuildCompileTime();
+    }
+
+    [Benchmark(Baseline = true)]
+    public Task Send_Runtime() => _runtime.Send(_request);
+
+    [Benchmark]
+    public Task Send_GeneratedDi() => _generatedDi.Send(_request);
+
+    [Benchmark]
+    public Task Send_CompileTime() => _compileTime.Send(_request);
+
+    [Benchmark]
+    public Task Publish_Runtime() => _runtime.Publish(_notification);
+
+    [Benchmark]
+    public Task Publish_GeneratedDi() => _generatedDi.Publish(_notification);
+
+    [Benchmark]
+    public Task Publish_CompileTime() => _compileTime.Publish(_notification);
+
+    private static IMediator BuildRuntime()
+    {
         var services = new ServiceCollection();
-
         services.AddSingleton(TextWriter.Null);
-
         services.AddUmlamuli(cfg =>
         {
             cfg.RegisterServicesFromAssemblyContaining(typeof(Ping));
             cfg.AddOpenBehavior(typeof(GenericPipelineBehavior<,>));
         });
-
-        var provider = services.BuildServiceProvider();
-
-        _mediator = provider.GetRequiredService<IMediator>();
+        return services.BuildServiceProvider().GetRequiredService<IMediator>();
     }
 
-    [Benchmark]
-    public Task SendingRequests()
+    private static IMediator BuildGeneratedDi()
     {
-        return _mediator.Send(_request);
+        var services = new ServiceCollection();
+        services.AddSingleton(TextWriter.Null);
+        services.AddUmlamuliGenerated();
+        return services.BuildServiceProvider().GetRequiredService<IMediator>();
     }
 
-    [Benchmark]
-    public Task PublishingNotifications()
+    private static IMediator BuildCompileTime()
     {
-        return _mediator.Publish(_notification);
+        var services = new ServiceCollection();
+        services.AddSingleton(TextWriter.Null);
+        services.AddUmlamuliCompileTime();
+        return services.BuildServiceProvider().GetRequiredService<IMediator>();
     }
 }

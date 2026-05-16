@@ -27,6 +27,7 @@ public class MultiRuntimeConfig : ManualConfig
 
         // Runtimes
         AddJob(Job.Default.WithRuntime(ClrRuntime.Net462));
+        AddJob(Job.Default.WithRuntime(ClrRuntime.Net481));
         AddJob(Job.Default.WithRuntime(CoreRuntime.Core80));
         AddJob(Job.Default.WithRuntime(CoreRuntime.Core90));
         AddJob(Job.Default.WithRuntime(CoreRuntime.Core10_0));

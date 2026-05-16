@@ -21,72 +21,26 @@ namespace Umlamuli.Registration;
 /// </summary>
 /// <remarks>
 ///     This registrar supports both closed and open generic handler discovery and enforces optional limits
-///     on generic handler expansion to prevent excessive registrations.
-///     Use <see cref="SetGenericRequestHandlerRegistrationLimitations" /> prior to invoking
-///     <see cref="AddUmlamuliClassesWithTimeout" /> or <see cref="AddUmlamuliClasses" /> if constraints are desired.
+///     on generic handler expansion to prevent excessive registrations. Limits and the registration timeout
+///     are read directly from the supplied <see cref="UmlamuliServiceConfiguration" /> on each call.
 /// </remarks>
 public static class ServiceRegistrar
 {
-    private static int _maxGenericTypeParameters;
-    private static int _maxTypesClosing;
-    private static int _maxGenericTypeRegistrations;
-    private static int _registrationTimeout;
-
-    /// <summary>
-    ///     Applies optional constraints governing how generic request handler registrations are expanded.
-    /// </summary>
-    /// <param name="configuration">Configuration source for constraint values.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration" /> is null.</exception>
-    /// <remarks>
-    ///     Limits:
-    ///     <list type="bullet">
-    ///         <item>
-    ///             <description><see cref="UmlamuliServiceConfiguration.MaxGenericTypeParameters" /> caps generic arity.</description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 <see cref="UmlamuliServiceConfiguration.MaxTypesClosing" /> caps candidate closing types per
-    ///                 parameter.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 <see cref="UmlamuliServiceConfiguration.MaxGenericTypeRegistrations" /> caps total expansion
-    ///                 count.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 <see cref="UmlamuliServiceConfiguration.RegistrationTimeout" /> sets millisecond timeout for
-    ///                 expansion (used by <see cref="AddUmlamuliClassesWithTimeout" />).
-    ///             </description>
-    ///         </item>
-    ///     </list>
-    ///     A value of 0 for any limit disables that constraint.
-    /// </remarks>
-    public static void SetGenericRequestHandlerRegistrationLimitations(UmlamuliServiceConfiguration configuration)
-    {
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-        _maxGenericTypeParameters = configuration.MaxGenericTypeParameters;
-        _maxTypesClosing = configuration.MaxTypesClosing;
-        _maxGenericTypeRegistrations = configuration.MaxGenericTypeRegistrations;
-        _registrationTimeout = configuration.RegistrationTimeout;
-    }
-
     /// <summary>
     ///     Scans configured assemblies and registers Umlamuli components enforcing a timeout for generic handler expansion.
     /// </summary>
     /// <param name="services">The DI service collection to append registrations to.</param>
     /// <param name="configuration">The mediator service configuration.</param>
     /// <exception cref="TimeoutException">
-    ///     Thrown when the generic handler expansion exceeds the configured timeout (see
-    ///     <see cref="SetGenericRequestHandlerRegistrationLimitations" />).
+    ///     Thrown when the generic handler expansion exceeds
+    ///     <see cref="UmlamuliServiceConfiguration.RegistrationTimeout" />.
     /// </exception>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration" /> is null.</exception>
     public static void AddUmlamuliClassesWithTimeout(IServiceCollection services,
         UmlamuliServiceConfiguration configuration)
     {
-        using var cts = new CancellationTokenSource(_registrationTimeout);
+        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+        using var cts = new CancellationTokenSource(configuration.RegistrationTimeout);
         try
         {
             AddUmlamuliClasses(services, configuration, cts.Token);
@@ -244,7 +198,8 @@ public static class ServiceRegistrar
         foreach (var @interface in genericInterfaces)
         {
             var exactMatches = genericConcretions.Where(x => x.CanBeCastTo(@interface)).ToList();
-            AddAllConcretionsThatClose(@interface, exactMatches, services, assembliesToScan, cancellationToken);
+            AddAllConcretionsThatClose(@interface, exactMatches, services, assembliesToScan, configuration,
+                cancellationToken);
         }
     }
 
@@ -328,11 +283,12 @@ public static class ServiceRegistrar
     /// </param>
     /// <param name="openRequestHandlerImplementation">Open handler implementation type.</param>
     /// <param name="assembliesToScan">Assemblies to search for candidate types that satisfy constraints.</param>
+    /// <param name="configuration">Registration configuration supplying generic expansion limits.</param>
     /// <param name="cancellationToken">Token to cancel enumeration.</param>
     /// <returns>A list of closed request types or null when the request generic is not yet closed.</returns>
     private static List<Type>? GetConcreteRequestTypes(Type openRequestHandlerInterface,
         Type openRequestHandlerImplementation, IEnumerable<Assembly> assembliesToScan,
-        CancellationToken cancellationToken)
+        UmlamuliServiceConfiguration configuration, CancellationToken cancellationToken)
     {
         // request generic type constraints
         var constraintsForEachParameter = openRequestHandlerImplementation
@@ -355,55 +311,53 @@ public static class ServiceRegistrar
 
         var requestGenericTypeDefinition = requestType.GetGenericTypeDefinition();
 
-        var combinations = GenerateCombinations(requestType, typesThatCanCloseForEachParameter, 0, cancellationToken);
+        var combinations = GenerateCombinationsCore(requestType, typesThatCanCloseForEachParameter,
+            configuration.MaxGenericTypeParameters, configuration.MaxTypesClosing,
+            configuration.MaxGenericTypeRegistrations, 0, cancellationToken);
 
         return combinations.Select(types => requestGenericTypeDefinition.MakeGenericType(types.ToArray())).ToList();
     }
 
     /// <summary>
-    ///     Generates all Cartesian product combinations from multiple candidate type lists respecting configured limits.
+    ///     Generates all Cartesian product combinations from multiple candidate type lists. Provided for backward
+    ///     compatibility; no limits are enforced. Internal expansion uses
+    ///     <see cref="GenerateCombinationsCore" /> with limits sourced from <see cref="UmlamuliServiceConfiguration" />.
     /// </summary>
     /// <param name="requestType">The original generic request type used for error reporting.</param>
     /// <param name="lists">Lists of candidate closing types per generic parameter.</param>
     /// <param name="depth">Current recursion depth (internal use).</param>
     /// <param name="cancellationToken">Token to cancel expansion mid-way.</param>
     /// <returns>All discovered combinations (each combination is an ordered list aligned with generic parameters).</returns>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="requestType" /> or <paramref name="lists" /> is
-    ///     null.
-    /// </exception>
-    /// <exception cref="ArgumentException">
-    ///     Thrown when any configured limit (<see cref="UmlamuliServiceConfiguration.MaxGenericTypeParameters" />,
-    ///     <see cref="UmlamuliServiceConfiguration.MaxTypesClosing" />,
-    ///     <see cref="UmlamuliServiceConfiguration.MaxGenericTypeRegistrations" />) is exceeded.
-    /// </exception>
     public static List<List<Type>> GenerateCombinations(Type requestType, List<List<Type>> lists, int depth = 0,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default) =>
+        GenerateCombinationsCore(requestType, lists, 0, 0, 0, depth, cancellationToken);
+
+    private static List<List<Type>> GenerateCombinationsCore(Type requestType, List<List<Type>> lists,
+        int maxGenericTypeParameters, int maxTypesClosing, int maxGenericTypeRegistrations,
+        int depth, CancellationToken cancellationToken)
     {
         if (requestType == null) throw new ArgumentNullException(nameof(requestType));
         if (lists == null) throw new ArgumentNullException(nameof(lists));
         if (depth == 0)
         {
-            // Initial checks
-            if (_maxGenericTypeParameters > 0 && lists.Count > _maxGenericTypeParameters)
+            if (maxGenericTypeParameters > 0 && lists.Count > maxGenericTypeParameters)
                 throw new ArgumentException(
-                    $"Error registering the generic type: {requestType.FullName}. The number of generic type parameters exceeds the maximum allowed ({_maxGenericTypeParameters}).");
+                    $"Error registering the generic type: {requestType.FullName}. The number of generic type parameters exceeds the maximum allowed ({maxGenericTypeParameters}).");
 
-            if (_maxTypesClosing > 0)
+            if (maxTypesClosing > 0)
             {
-                foreach (var list in lists.Where(list => list.Count > _maxTypesClosing))
+                foreach (var list in lists.Where(list => list.Count > maxTypesClosing))
                     throw new ArgumentException(
-                        $"Error registering the generic type: {requestType.FullName}. One of the generic type parameter's count of types that can close exceeds the maximum length allowed ({_maxTypesClosing}).");
+                        $"Error registering the generic type: {requestType.FullName}. One of the generic type parameter's count of types that can close exceeds the maximum length allowed ({maxTypesClosing}).");
             }
 
-            // Calculate the total number of combinations
             long totalCombinations = 1;
             foreach (var list in lists)
             {
                 totalCombinations *= list.Count;
-                if (_maxGenericTypeRegistrations > 0 && totalCombinations > _maxGenericTypeRegistrations)
+                if (maxGenericTypeRegistrations > 0 && totalCombinations > maxGenericTypeRegistrations)
                     throw new ArgumentException(
-                        $"Error registering the generic type: {requestType.FullName}. The total number of generic type registrations exceeds the maximum allowed ({_maxGenericTypeRegistrations}).");
+                        $"Error registering the generic type: {requestType.FullName}. The total number of generic type registrations exceeds the maximum allowed ({maxGenericTypeRegistrations}).");
             }
         }
 
@@ -413,7 +367,8 @@ public static class ServiceRegistrar
         cancellationToken.ThrowIfCancellationRequested();
 
         var currentList = lists[depth];
-        var childCombinations = GenerateCombinations(requestType, lists, depth + 1, cancellationToken);
+        var childCombinations = GenerateCombinationsCore(requestType, lists,
+            maxGenericTypeParameters, maxTypesClosing, maxGenericTypeRegistrations, depth + 1, cancellationToken);
         var combinations = new List<List<Type>>();
 
         foreach (var item in currentList)
@@ -435,14 +390,17 @@ public static class ServiceRegistrar
     /// <param name="concretions">List of open generic handler implementation types that can be closed.</param>
     /// <param name="services">DI service collection.</param>
     /// <param name="assembliesToScan">Assemblies to search for closing types.</param>
+    /// <param name="configuration">Registration configuration supplying generic expansion limits.</param>
     /// <param name="cancellationToken">Cancellation token for the operation.</param>
     private static void AddAllConcretionsThatClose(Type openRequestInterface, List<Type> concretions,
-        IServiceCollection services, IEnumerable<Assembly> assembliesToScan, CancellationToken cancellationToken)
+        IServiceCollection services, IEnumerable<Assembly> assembliesToScan,
+        UmlamuliServiceConfiguration configuration, CancellationToken cancellationToken)
     {
         foreach (var concretion in concretions)
         {
             var concreteRequests =
-                GetConcreteRequestTypes(openRequestInterface, concretion, assembliesToScan, cancellationToken);
+                GetConcreteRequestTypes(openRequestInterface, concretion, assembliesToScan, configuration,
+                    cancellationToken);
 
             if (concreteRequests is null)
                 continue;

@@ -130,3 +130,26 @@ services.AddUmlamuliCompileTime();
 Binds `IMediator` to a source-generated `UmlamuliGeneratedMediator` that dispatches each request via a `switch` over the concrete request types discovered at compile time. No `MakeGenericType`, no wrapper cache — just a pattern match followed by a typed call into the service provider. Pipeline behaviors and `INotificationPublisher` remain pluggable and are resolved from DI at dispatch time.
 
 Only handlers defined in the consuming assembly are discovered. To pull handlers from other assemblies, reference those assemblies and ensure they also reference `Umlamuli.SourceGenerator` (or call `AddUmlamuli(cfg => cfg.RegisterServicesFromAssemblyContaining<T>())` alongside the generated registrations).
+
+## Breaking changes
+
+### `ServiceRegistrar.SetGenericRequestHandlerRegistrationLimitations` removed
+
+Previously, generic-handler expansion limits and the registration timeout were held in static fields on `ServiceRegistrar` and seeded by `SetGenericRequestHandlerRegistrationLimitations(configuration)`. That method has been removed, and the static fields with it.
+
+Limits are now read directly from the `UmlamuliServiceConfiguration` passed to `AddUmlamuli` on every call, which makes concurrent `AddUmlamuli` invocations safe.
+
+If you set those limits via the configuration action (the documented path), no change is required:
+
+```csharp
+services.AddUmlamuli(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Startup).Assembly);
+    cfg.MaxGenericTypeParameters = 10;
+    cfg.MaxTypesClosing = 100;
+    cfg.MaxGenericTypeRegistrations = 125_000;
+    cfg.RegistrationTimeout = 10_000;
+});
+```
+
+If you were calling `ServiceRegistrar.SetGenericRequestHandlerRegistrationLimitations(...)` directly, delete the call and ensure the same values are set on the `UmlamuliServiceConfiguration` instance you pass to `AddUmlamuli` or `ServiceRegistrar.AddUmlamuliClassesWithTimeout`.
